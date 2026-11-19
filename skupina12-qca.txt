@@ -1,0 +1,7 @@
+**Vpliv premika posameznih celic QCA na pravilnost delovanja logičnega vezja**
+
+Skupina 12
+
+Jerneja Krajcar, Amar Mehić, Anže Vidmar
+
+**Opis:** V seminarski nalogi bomo raziskali vpliv napak pri pozicioniranju celic na pravilnost delovanja kvantnih celičnih avtomatov (QCA). Osredotočili se bomo na premik posameznih celic v večinskih vratih (angl. majority voter), ki predstavljajo enega izmed osnovnih gradnikov QCA vezij. Najprej bomo pregledali obstoječe raziskave o toleranci QCA celic na napake pri izdelavi, nato pa bomo v orodju QCADesigner izvedli simulacije, pri katerih bomo postopoma spreminjali položaj izbranih celic v različnih smereh. Za vsako spremembo bomo preverili, ali večinska vrata še vedno pravilno izračunajo izhodno vrednost. Na podlagi rezultatov bomo določili, kolikšne napake pri pozicioniranju posameznih celic vezje še prenese, preden pride do napačnega delovanja. Rezultate bomo primerjali z ugotovitvami izbranih znanstvenih člankov. Cilj naloge je ugotoviti, katere celice so najbolj občutljive na napake pri pozicioniranju, kako smer in velikost premika vplivata na pravilnost delovanja vezja ter kako natančna mora biti izdelava QCA čipov, da se zagotovi njihovo zanesljivo delovanje.
