@@ -1,0 +1,85 @@
+--- main_batch_sim.c
++++ main_batch_sim.c
+@@ -39,6 +39,12 @@
+ #include "simulation_data.h"
+ #include "coherence_vector.h"
+ #include "coherence_vector_energy.h"
++#include "objects/QCADCell.h"
++#include "objects/QCADLayer.h"
++#include "objects/QCADLabel.h"
++#include "objects/QCADRuler.h"
++#include "objects/QCADSubstrate.h"
++#include "objects/QCADStretchyObject.h"
+ #include "graph_dialog_widget_data.h"
+ #include "bistable_simulation.h"
+ 
+@@ -77,6 +83,10 @@
+   gtk_init (&argc, &argv) ;
+ #else
+   g_type_init () ;
++  // register object types up front: g_type_from_name() only finds registered types
++  qcad_design_object_get_type () ; qcad_stretchy_object_get_type () ;
++  qcad_label_get_type () ; qcad_cell_get_type () ; qcad_layer_get_type () ;
++  qcad_ruler_get_type () ; qcad_substrate_get_type () ;
+ #endif /* def GTK_GUI */
+ 
+   if (pszSimEngine != NULL)
+@@ -279,10 +289,10 @@
+         (*sim_engine) =
+           !strncmp (argv[Nix], "BISTABLE", 8)
+             ? BISTABLE
+-            : !strncmp (argv[Nix], "COHERENCE_VECTOR", 16)
+-              ? COHERENCE_VECTOR
+-              : !strncmp (argv[Nix], "COHERENCE_VECTOR_ENERGY", 23)
+-		? COHERENCE_VECTOR_ENERGY
++            : !strncmp (argv[Nix], "COHERENCE_VECTOR_ENERGY", 23)
++              ? COHERENCE_VECTOR_ENERGY
++              : !strncmp (argv[Nix], "COHERENCE_VECTOR", 16)
++		? COHERENCE_VECTOR
+ 		: BISTABLE /* default */ ;
+         icParms++ ;
+         }
+--- fileio.c
++++ fileio.c
+@@ -914,6 +914,24 @@
+     if (!strncmp (pszLine, "layer_separation", sizeof ("layer_separation") - 1))
+       coherence_energy_options->layer_separation = g_ascii_strtod (pszValue, NULL) ;
+     else
++    if (!strncmp (pszLine, "clock_period", sizeof ("clock_period") - 1))
++      coherence_energy_options->clock_period = g_ascii_strtod (pszValue, NULL) ;
++    else
++    if (!strncmp (pszLine, "input_period", sizeof ("input_period") - 1))
++      coherence_energy_options->input_period = g_ascii_strtod (pszValue, NULL) ;
++    else
++    if (!strncmp (pszLine, "t_slope_ramp", sizeof ("t_slope_ramp") - 1))
++      coherence_energy_options->t_slope_ramp = g_ascii_strtod (pszValue, NULL) ;
++    else
++    if (!strncmp (pszLine, "clock_type", sizeof ("clock_type") - 1))
++      coherence_energy_options->clock_type = atoi (pszValue) ;
++    else
++    if (!strncmp (pszLine, "zero_mode_act", sizeof ("zero_mode_act") - 1))
++      coherence_energy_options->zero_mode_act = !strncmp (pszValue, "TRUE", sizeof ("TRUE") - 1) ? TRUE : FALSE ;
++    else
++    if (!strncmp (pszLine, "display_cell_diss", sizeof ("display_cell_diss") - 1))
++      coherence_energy_options->display_cell_diss = !strncmp (pszValue, "TRUE", sizeof ("TRUE") - 1) ? TRUE : FALSE ;
++    else
+     if (!strncmp (pszLine, "algorithm", sizeof ("algorithm") - 1))
+       coherence_energy_options->algorithm = atoi (pszValue) ;
+     else
+--- coherence_vector_energy.c
++++ coherence_vector_energy.c
+@@ -590,8 +590,12 @@
+     // 3rd place cell into array
+     // distance is fixed: dX=20, dy=20 = CELL_DIST
+     for ( c = 0; c < number_of_cells_in_layer[k]; c++) {
+-      sort_x = 1+(QCAD_DESIGN_OBJECT(sorted_cells[k][c])->x - x_min) / CELL_DIST;
+-      sort_y = 1+(QCAD_DESIGN_OBJECT(sorted_cells[k][c])->y - y_min) / CELL_DIST;
++      // round to the nearest grid position (truncation put slightly displaced
++      // cells into the slot of their neighbour, which dropped them from the sums)
++      sort_x = 1+lround((QCAD_DESIGN_OBJECT(sorted_cells[k][c])->x - x_min) / CELL_DIST);
++      sort_y = 1+lround((QCAD_DESIGN_OBJECT(sorted_cells[k][c])->y - y_min) / CELL_DIST);
++      if (sort[sort_x][sort_y] != -1)
++        fprintf (stderr, "WARNING: two cells in energy grid slot [%d][%d]\n", sort_x, sort_y) ;
+       sort[sort_x][sort_y] = c;      
+     }
+         
