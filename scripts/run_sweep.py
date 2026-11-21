@@ -82,9 +82,13 @@ def stretch(values: list[int], n: int) -> list[int]:
     return [values[k * len(values) // n] for k in range(n)]
 
 
-def check_majority(traces, inputs: list[str], output: str) -> tuple[str, str, str]:
-    """Return (status, output bits, input that the output follows)."""
-    if output not in traces or any(i not in traces for i in inputs):
+def check_majority(traces, output: str) -> tuple[str, str, str]:
+    """Return (status, output bits, input that the output follows).
+
+    Every bus other than the output is an input.
+    """
+    inputs = [bus for bus in traces if bus != output]
+    if output not in traces or len(inputs) != 3:
         return "no_result", "", ""
 
     out = traces[output]
@@ -127,7 +131,6 @@ def main() -> None:
     args = parser.parse_args()
 
     cells, _ = parse_qca(args.base)
-    inputs = [name(c) for c in cells if c.function == "QCAD_CELL_INPUT"]
     output = next(name(c) for c in cells if c.function == "QCAD_CELL_OUTPUT")
     moved_cells = [c for c in cells if not args.cells or c.cell_id in args.cells]
     steps = [i * args.step for i in range(round(args.max / args.step) + 1)]
@@ -157,7 +160,7 @@ def main() -> None:
 
                     sim_output = simulate(args.batch_sim, ready, args.engine, args.options)
                     row["status"], row["output_bits"], row["followed_input"] = check_majority(
-                        read_traces(sim_output), inputs, output)
+                        read_traces(sim_output), output)
                     row["energy_eV"], row["energy_error_eV"] = read_energy(sim_output)
                     writer.writerow(row)
 

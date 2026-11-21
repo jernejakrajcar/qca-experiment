@@ -16,7 +16,7 @@ Vse ukaze poženite v korenu repozitorija.
 # 1. okolje: Ubuntu, Python in popravljen batch_sim (prvič traja nekaj minut)
 docker build -t qca-sim -f tools/Dockerfile tools
 
-# 2. vsi poskusi (E1–E3) in vse slike
+# 2. vsi poskusi (E1–E4) in vse slike
 docker run --rm -v "$PWD":/repo qca-sim sh scripts/run_all.sh
 ```
 
@@ -41,6 +41,7 @@ docker run --rm -v "$PWD":/repo qca-sim python3 scripts/run_sweep.py \
 | E1 | bistabilni | `experiments/results/e1-bistable.csv` |
 | E2 | koherentni vektor, 1 K in 10 K | `experiments/results/e2-coherence-*.csv` |
 | E3 | koherentni vektor z energijo, 1 K | `experiments/results/e3-energy-1K.csv` |
+| E4 | objavljena vrata, sredinska celica, 1 K in 10 K | `experiments/results/e4-published-*.csv` |
 
 Vsaka vrstica v CSV je ena simulacija: celica, smer, premik, `status`
 (`ok`, `fail` ali `overlap`, ko bi se celica dotaknila soseda), izhod, vhod, ki
@@ -54,10 +55,12 @@ poročilo pa v `experiments/figures/`.
 | Pot | Vsebina |
 |---|---|
 | `experiments/majority-voter-base.qca` | osnovno vezje (5 celic) |
+| `experiments/published-majority-use.qca` | objavljena vrata iz QCADesigner-E (urina shema USE) |
 | `scripts/run_sweep.py` | premiki celic, simulacija in preverjanje izhoda |
 | `scripts/prepare_batch.py` | priprava datoteke `.qca` za `batch_sim` |
 | `scripts/move_cell.py`, `analyze_qca.py` | premik in branje celic v datoteki `.qca` |
 | `scripts/plot_tolerance.py`, `plot_circuit.py` | slike in tabela za poročilo |
+| `scripts/compare_published.py` | primerjava z objavljenimi vrati (tabela metrik) |
 | `tools/` | Dockerfile in popravki za `batch_sim` |
 | `test/`, `generated/` | prvi ročni poskusi (glej poročilo, *Kaj ni delovalo*) |
 
