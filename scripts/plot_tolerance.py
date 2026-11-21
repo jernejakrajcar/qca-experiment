@@ -64,7 +64,7 @@ def bar_chart(data: dict) -> None:
     legend = [Patch(color=color, label=label) for _, label, color in SERIES]
     legend.append(Patch(facecolor="white", edgecolor=MUTED, hatch="////",
                         label="omejeno s prekrivanjem s sosednjo celico"))
-    ax.legend(handles=legend, loc="lower right", fontsize=8, frameon=False)
+    ax.legend(handles=legend, loc="upper right", fontsize=8, frameon=False)
 
     fig.tight_layout()
     fig.savefig(FIGURES / "tolerance.pdf")
